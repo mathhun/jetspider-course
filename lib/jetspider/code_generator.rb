@@ -1,5 +1,6 @@
 require 'jetspider/ast'
 require 'jetspider/exception'
+require 'pp'
 
 module JetSpider
   class CodeGenerator < AstVisitor
@@ -82,7 +83,11 @@ module JetSpider
     #
 
     def visit_FunctionCallNode(n)
-      raise NotImplementedError, 'FunctionCallNode'
+      @asm.callgname(n.value.value)
+      n.arguments.value.each do |arg|
+        visit arg
+      end
+      @asm.call(n.arguments.value.length)
     end
 
     def visit_FunctionDeclNode(n)
@@ -311,7 +316,8 @@ module JetSpider
     end
 
     def visit_StringNode(n)
-      raise NotImplementedError, 'StringNode'
+      raise "Non quoted string given" if n.value.length < 2
+      @asm.string(n.value[1 .. n.value.length-2])
     end
 
     def visit_ArrayNode(n) raise "ArrayNode not implemented"; end
