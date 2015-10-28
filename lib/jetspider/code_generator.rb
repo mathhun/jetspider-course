@@ -307,7 +307,7 @@ module JetSpider
     end
 
     def visit_NumberNode(n)
-      raise NotImplementedError, 'NumberNode'
+      @asm.int(n.value)
     end
 
     def visit_StringNode(n)
