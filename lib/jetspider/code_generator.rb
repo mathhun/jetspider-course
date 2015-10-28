@@ -201,15 +201,17 @@ module JetSpider
       visit n.value
     end
 
-    def visit_AddNode(n)
-      raise NotImplementedError, 'AddNode'
-    end
-
-    def visit_SubtractNode(n)
-      visit node.left
-      visit node.value
-      @asm.sub
-    end
+    #def visit_AddNode(n)
+    #  visit n.left
+    #  visit n.value
+    #  @asm.add
+    #end
+    #
+    #def visit_SubtractNode(n)
+    #  visit node.left
+    #  visit node.value
+    #  @asm.sub
+    #end
 
     def self.simple_binary_op(node_class, insn_name)
       define_method(:"visit_#{node_class}") {|node|
@@ -219,6 +221,8 @@ module JetSpider
       }
     end
 
+    simple_binary_op 'AddNode', :add
+    simple_binary_op 'SubtractNode', :sub
     simple_binary_op 'MultiplyNode', :mul
     simple_binary_op 'DivideNode', :div
     simple_binary_op 'ModulusNode', :mod
