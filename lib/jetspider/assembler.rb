@@ -151,6 +151,14 @@ module JetSpider
       put_insn 'setgname', get_atom_id(name)
     end
 
+    def gnameinc(name)
+      put_insn 'gnameinc', get_atom_id(name)
+    end
+
+    def gnamedec(name)
+      put_insn 'gnamedec', get_atom_id(name)
+    end
+
     def call(len)
       put_insn 'call', ObjectFile.uint16(len)
     end

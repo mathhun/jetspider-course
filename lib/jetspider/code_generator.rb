@@ -114,11 +114,13 @@ module JetSpider
     #
 
     def visit_ResolveNode(n)
-      raise NotImplementedError, 'ResolveNode'
+      @asm.getgname n.value
     end
 
     def visit_OpEqualNode(n)
-      raise NotImplementedError, 'OpEqualNode'
+      @asm.bindgname n.left.value
+      visit n.value
+      @asm.setgname n.left.value
     end
 
     def visit_VarStatementNode(n)
@@ -240,7 +242,14 @@ module JetSpider
     end
 
     def visit_PostfixNode(n)
-      raise "PostfixNode not implemented"
+      case n.value
+      when "++"
+        @asm.gnameinc n.operand.value
+      when "--"
+        @asm.gnamedec n.operand.value
+      else
+        raise "Invalid unary operator: #{n.value}"
+      end
     end
 
     def visit_BitwiseNotNode(n) raise "BitwiseNotNode not implemented"; end
