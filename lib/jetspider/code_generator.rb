@@ -156,7 +156,18 @@ module JetSpider
     #
 
     def visit_IfNode(n)
-      raise NotImplementedError, 'IfNode'
+      visit n.conditions
+      loc_else = @asm.lazy_location
+      @asm.ifeq loc_else
+      # then
+      visit n.value
+      loc_endif = @asm.lazy_location
+      @asm.goto loc_endif
+      @asm.nullblockchain
+      # else
+      @asm.fix_location(loc_else)
+      visit n.else
+      @asm.fix_location(loc_endif)
     end
 
     def visit_ConditionalNode(n)
