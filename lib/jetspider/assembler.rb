@@ -123,6 +123,10 @@ module JetSpider
       put_relative_jump 'ifeq', target
     end
 
+    def ifne(target)
+      put_relative_jump 'ifne', target
+    end
+
     def goto(target)
       put_relative_jump 'goto', target
     end
@@ -193,6 +197,10 @@ module JetSpider
 
     def callprop(name)
       put_insn 'callprop', get_atom_id(name)
+    end
+
+    def trace(n)
+      put_insn 'trace', ObjectFile.uint8(n)
     end
 
   end
