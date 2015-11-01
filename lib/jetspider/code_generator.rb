@@ -104,7 +104,8 @@ module JetSpider
     def visit_FunctionExprNode(n) raise "FunctionExprNode not implemented"; end
 
     def visit_ReturnNode(n)
-      raise NotImplementedError, 'ReturnNode'
+      visit n.value
+      @asm.return
     end
 
     # These nodes should not be visited directly
@@ -117,13 +118,26 @@ module JetSpider
     #
 
     def visit_ResolveNode(n)
-      @asm.getgname n.value
+      if n.variable.parameter?
+        @asm.getarg n.variable.index
+      elsif n.variable.local?
+        @asm.getlocal n.variable.index
+      else
+        @asm.getgname n.value
+      end
     end
 
     def visit_OpEqualNode(n)
-      @asm.bindgname n.left.value
-      visit n.value
-      @asm.setgname n.left.value
+      if n.variable.global?
+        @asm.bindgname n.left.value
+        visit n.value
+        @asm.setgname n.left.value
+      elsif n.variable.local?
+        visit n.value
+        @asm.setlocal n.left.value
+      else
+        raise "Invalid OpEqual"
+      end
     end
 
     def visit_VarStatementNode(n)
@@ -133,10 +147,26 @@ module JetSpider
     end
 
     def visit_VarDeclNode(n)
-      @asm.bindgname n.name
-      visit n.value
-      @asm.setgname n.name
-      @asm.pop
+      if n.variable.global?
+        @asm.bindgname n.name
+        if n.value
+          visit n.value
+          @asm.setgname n.name
+        else
+          @asm.getgname n.name
+        end
+        @asm.pop
+      elsif n.variable.local?
+        if n.value
+          visit n.value
+          @asm.setlocal n.variable.index
+        else
+          @asm.getlocal n.variable.index
+        end
+        @asm.pop
+      else
+        raise "Invalid VarDecl"
+      end
     end
 
     def visit_AssignExprNode(n)
