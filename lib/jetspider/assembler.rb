@@ -89,8 +89,8 @@ module JetSpider
     # utility command
     def int(num)
       case num
-      #when 0 then zero
-      #when 1 then one
+      when 0 then zero
+      when 1 then one
       when -128 .. 127 then int8(num)
       when 128 .. 2**16-1 then uint16(num)
       when 2**16 .. 2**24-1 then uint24(num)
