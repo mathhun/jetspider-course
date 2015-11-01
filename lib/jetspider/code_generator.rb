@@ -7,6 +7,9 @@ module JetSpider
     def initialize(object_file)
       @object_file = object_file
       @asm = nil
+
+      @loop_break_loc = []
+      @loop_continue_loc = []
     end
 
     def generate_object_file(ast)
@@ -184,9 +187,11 @@ module JetSpider
     end
 
     def visit_WhileNode(n)
-      cond = @asm.lazy_location
-      @asm.goto cond
+      @loop_break_loc.push @asm.lazy_location
+      @loop_continue_loc.push @asm.lazy_location
 
+      # jump to condition
+      @asm.goto @loop_continue_loc[-1]
       # restart
       restart = @asm.location
 
@@ -194,9 +199,11 @@ module JetSpider
       visit n.value
 
       # condition
-      @asm.fix_location cond
+      @asm.fix_location @loop_continue_loc.pop
       visit n.left
       @asm.ifne restart
+
+      @asm.fix_location @loop_break_loc.pop
     end
 
     def visit_DoWhileNode(n)
@@ -208,11 +215,11 @@ module JetSpider
     end
 
     def visit_BreakNode(n)
-      raise NotImplementedError, 'BreakNode'
+      @asm.goto @loop_break_loc[-1]
     end
 
     def visit_ContinueNode(n)
-      raise NotImplementedError, 'ContinueNode'
+      @asm.goto @loop_continue_loc[-1]
     end
 
     def visit_SwitchNode(n) raise "SwitchNode not implemented"; end
